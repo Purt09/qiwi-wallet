@@ -2,6 +2,7 @@
 SDK for working with apirone.com
 ### From CLI
 ```$xslt
+$ composer config repositories.apirone vcs https://github.com/purt09/apirone.git
 $ composer require purt09/apirone:dev-master
 ```
 ## Unit testing
