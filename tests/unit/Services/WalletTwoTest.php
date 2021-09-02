@@ -27,8 +27,15 @@ class WalletTwoTest extends TestCase
     {
         $wallet_id = 'btc-c260284a22281cf7abf5593705fd4afc';
         $walletService = new Wallet();
-        $address_result = $walletService->generateAddress($wallet_id, 'https://bot-t.ru/');
+        $params = [
+            'test' => 'test'
+        ];
+        $address_result = $walletService->generateAddress(
+            $wallet_id,
+            'https://bot-t.ru/',
+            $params);
         $this->assertArrayHasKey('address', $address_result);
+        $this->assertArrayHasKey('data', $address_result["callback"]);
     }
 
     public function testGenerateLTCAddress(): void
@@ -46,6 +53,5 @@ class WalletTwoTest extends TestCase
         $result = $walletService->getBalance($wallet_id);
         print_r($result);
         $this->assertArrayHasKey('total', $result);
-        $this->assertEquals($result['currency'], 'btc');
     }
 }

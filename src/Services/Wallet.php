@@ -69,7 +69,7 @@ class Wallet implements WalletInterface
                 ]
             ];
 
-            if (empty($callback_data)) {
+            if (count($callback_data) > 0) {
                 $payload["callback"]["data"] = $callback_data;
             }
         }
