@@ -4,6 +4,7 @@
 namespace Test\unit\Services;
 
 
+use Purt09\Apirone\Exceprtion\ApironeException;
 use Purt09\Apirone\Services\Course;
 use PHPUnit\Framework\TestCase;
 
@@ -29,13 +30,6 @@ class CourseTest extends TestCase
         $this->assertArrayHasKey('EUR', $wallet_result);
     }
 
-    public function testGetRate(): void
-    {
-        $course = new Course();
-        $wallet_result = $course->getRate('USD', '1562409674', 'btc');
-        $this->assertEquals($wallet_result, 11447.66);
-    }
-
     public function testToBTC(): void
     {
         $course = new Course();
@@ -48,5 +42,29 @@ class CourseTest extends TestCase
         $course = new Course();
         $wallet_result = $course->toLtc('USD', '100');
         $this->assertIsFloat($wallet_result);
+    }
+
+    public function testToBCH(): void
+    {
+        $course = new Course();
+        $wallet_result = $course->toBch('USD', '100');
+        $this->assertIsFloat($wallet_result);
+    }
+
+    public function testToDOGE(): void
+    {
+        $course = new Course();
+        $wallet_result = $course->toDoge('USD', '100');
+        $this->assertIsFloat($wallet_result);
+    }
+
+    public function testCheckNotValid()
+    {
+        $course = new Course();
+        try {
+            $course->toBtc('ASDASD', '100');
+        } catch (ApironeException $e) {
+            $this->assertEquals($e->getMessage(), 'not valid currency');
+        }
     }
 }

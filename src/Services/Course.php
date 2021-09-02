@@ -4,6 +4,7 @@
 namespace Purt09\Apirone\Services;
 
 
+use Purt09\Apirone\Exceprtion\ApironeException;
 use Purt09\Apirone\Traits\Api;
 use Purt09\Apirone\Interfaces\CourseInterface;
 
@@ -14,9 +15,10 @@ class Course implements CourseInterface
 
     const ENDPOINTS = [
         'ticker' => '/ticker',
-        'rate' => '/rate',
         'toBtc' => '/tobtc',
-        'toLtc' => '/toltc'
+        'toLtc' => '/toltc',
+        'toBch' => '/tobch',
+        'toDoge' => '/todoge'
     ];
 
     /**
@@ -31,28 +33,12 @@ class Course implements CourseInterface
 
     /**
      * @param string $currency
-     * @param int $timestamp
-     * @param string $crypto
-     * @return float
-     */
-    public function getRate(string $currency, int $timestamp, string $crypto): float
-    {
-        $params = [
-            'currency' => $currency,
-            'timestamp' => $timestamp,
-            'crypto' => $crypto
-        ];
-        $url = $this->getURL(self::ENDPOINTS['rate'], [], 'v1');
-        return $this->get($url, $params);
-    }
-
-    /**
-     * @param string $currency
      * @param $value
      * @return float
      */
     public function toBtc(string $currency, $value): float
     {
+        $this->checkCurrency($currency);
         $params = [
             'currency' => $currency,
             'value' => $value
@@ -69,11 +55,54 @@ class Course implements CourseInterface
      */
     public function toLtc(string $currency, $value): float
     {
+        $this->checkCurrency($currency);
         $params = [
             'currency' => $currency,
             'value' => $value
         ];
         $url = $this->getURL(self::ENDPOINTS['toLtc'], [], 'v1');
         return $this->get($url, $params);
+    }
+
+    /**
+     * @param string $currency
+     * @param $value
+     * @return float
+     */
+    public function toBch(string $currency, $value): float
+    {
+        $this->checkCurrency($currency);
+        $params = [
+            'currency' => $currency,
+            'value' => $value
+        ];
+        $url = $this->getURL(self::ENDPOINTS['toBch'], [], 'v1');
+        return $this->get($url, $params);
+    }
+
+    /**
+     * @param string $currency
+     * @param $value
+     * @return float
+     */
+    public function toDoge(string $currency, $value): float
+    {
+        $this->checkCurrency($currency);
+        $params = [
+            'currency' => $currency,
+            'value' => $value
+        ];
+        $url = $this->getURL(self::ENDPOINTS['toDoge'], [], 'v1');
+        return $this->get($url, $params);
+    }
+
+    private function checkCurrency(string $currency): void
+    {
+        $currency = strtolower($currency);
+        $validCurrencies = [
+            'usd', 'eur', 'gbp', 'rub'
+        ];
+        if(!in_array($currency, $validCurrencies))
+            throw new ApironeException('not valid currency');
     }
 }

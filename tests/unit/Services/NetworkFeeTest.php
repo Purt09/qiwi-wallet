@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+namespace Test\unit\Services;
 
 use PHPUnit\Framework\TestCase;
 use Purt09\Apirone\Services\NetworkFee;
@@ -10,6 +10,23 @@ class NetworkFeeTest extends TestCase
     {
         $network_fee = new NetworkFee();
         $result = $network_fee->fee();
-        $this->assertArrayHasKey('economical', $result);
+        $this->assertArrayHasKey('strategy', $result[0]);
+        $this->assertArrayHasKey('strategy', $result[1]);
+        $this->assertEquals('normal', $result[0]['strategy']);
+        $this->assertEquals('priority', $result[1]['strategy']);
+    }
+
+    public function testGetNormal()
+    {
+        $network_fee = new NetworkFee();
+        $normal = $network_fee->getNormal();
+        $this->assertIsFloat($normal);
+    }
+
+    public function testGetPriority()
+    {
+        $network_fee = new NetworkFee();
+        $normal = $network_fee->getPriority();
+        $this->assertIsFloat($normal);
     }
 }

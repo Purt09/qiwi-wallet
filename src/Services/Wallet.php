@@ -13,9 +13,11 @@ class Wallet implements WalletInterface
 
     const ENDPOINTS = [
         'create' => '/wallet',
-        'generateAddress' => '/wallet/%s/address',
-        'getBalance' => '/wallet/%s/balance',
-        'transfer' => '/wallet/%s/transfer'
+        'generateAddress' => '/wallets/%s/addresses',
+        'getBalance' => '/wallets/%s/balance',
+        'getEstimation' => '/wallets/%s/transfer?destinations=%s&fee=%s&subtract_fee_from_amount=%s',
+        'transfer' => '/wallet/%s/transfer',
+        'getHistory' => 'wallets//%s/history?limit=/%s&offset=/%s&q=/%s'
     ];
 
     /**
@@ -81,7 +83,8 @@ class Wallet implements WalletInterface
      */
     public function getBalance(string $wallet_id): array
     {
-        $url = $this->getURL(self::ENDPOINTS['getBalance'], [trim($wallet_id)]);
+        $wallet_id = explode('-', $wallet_id);
+        $url = $this->getURL(self::ENDPOINTS['getBalance'], [trim($wallet_id[1])]);
         return $this->get($url);
     }
 
@@ -99,5 +102,10 @@ class Wallet implements WalletInterface
         ];
         $url = $this->getURL(self::ENDPOINTS['transfer'], [trim($wallet_id)]);
         return $this->post($url, $payload);
+    }
+
+    public function getHistory(string $wallet_id, string $limit, string $offset, string $q)
+    {
+        $url = $this->getURL(self::ENDPOINTS['getHistory'], [trim($wallet_id), $limit, $offset, $q]);
     }
 }

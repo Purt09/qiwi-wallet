@@ -19,7 +19,7 @@ $ php vendor/bin/phpunit --bootstrap vendor/autoload.php tests/unit/Services/Cou
 ```
 or
 ```$xslt
-$ "vendor/bin/phpunit" --bootstrap vendor/autoload.php tests/unit/Services/WalletTest.php
+$ "vendor/bin/phpunit" --bootstrap vendor/autoload.php tests/unit/Services/WalletTwoTest.php
 $ "vendor/bin/phpunit" --bootstrap vendor/autoload.php tests/unit/Services/NetworkFeeTest.php
 $ "vendor/bin/phpunit" --bootstrap vendor/autoload.php tests/unit/Services/CourseTest.php
 ```
