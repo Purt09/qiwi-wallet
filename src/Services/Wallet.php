@@ -17,7 +17,8 @@ class Wallet implements WalletInterface
         'getBalance' => '/wallets/%s/balance',
         'getEstimation' => '/wallets/%s/transfer?destinations=%s&fee=%s&subtract_fee_from_amount=%s',
         'transfer' => '/wallet/%s/transfer',
-        'getHistory' => 'wallets//%s/history?limit=/%s&offset=/%s&q=/%s'
+        'getHistory' => '/wallets/%s/history?limit=%s&offset=%s&q=%s',
+        'checkAddress' => '/wallets/%s/addresses/%s'
     ];
 
     /**
@@ -108,8 +109,15 @@ class Wallet implements WalletInterface
         return $this->post($url, $payload);
     }
 
+    public function checkAddress(string $wallet_id, string $address)
+    {
+        $url = $this->getURL(self::ENDPOINTS['checkAddress'], [trim($wallet_id), $address]);
+        return $this->get($url);
+    }
+
     public function getHistory(string $wallet_id, string $limit, string $offset, string $q)
     {
         $url = $this->getURL(self::ENDPOINTS['getHistory'], [trim($wallet_id), $limit, $offset, $q]);
+//        return $this->post($url, $payload);
     }
 }

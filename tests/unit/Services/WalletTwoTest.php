@@ -61,4 +61,13 @@ class WalletTwoTest extends TestCase
         $result = $walletService->getBalance($wallet_id, 'ltc');
         $this->assertArrayHasKey('total', $result);
     }
+
+    public function testCheckAddress(): void
+    {
+        $wallet_id = 'btc-2e42ca863457247208f5f477fd4ebc4c';
+        $address = '3NuMG1SfAa8mNubKUKriwZhNq7SGaxWeCt';
+        $walletService = new Wallet();
+        $result = $walletService->checkAddress($wallet_id, $address);
+        $this->assertEquals($result['balance']['available'], 58622);
+    }
 }
