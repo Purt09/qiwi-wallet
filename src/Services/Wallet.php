@@ -79,12 +79,16 @@ class Wallet implements WalletInterface
 
     /**
      * @param string $wallet_id
+     * @param string $currency
      * @return array
      */
-    public function getBalance(string $wallet_id): array
+    public function getBalance(string $wallet_id, string $currency = 'btc'): array
     {
-        $wallet_id = explode('-', $wallet_id);
-        $url = $this->getURL(self::ENDPOINTS['getBalance'], [trim($wallet_id[1])]);
+        if($currency == 'btc') {
+            $wallet_id = explode('-', $wallet_id);
+            $wallet_id = $wallet_id[1];
+        }
+        $url = $this->getURL(self::ENDPOINTS['getBalance'], [trim($wallet_id)]);
         return $this->get($url);
     }
 
