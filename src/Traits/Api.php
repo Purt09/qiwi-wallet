@@ -1,47 +1,40 @@
 <?php
 declare(strict_types=1);
 
-namespace Purt09\Apirone\Traits;
+namespace Purt09\QiwiWallet\Traits;
 
 trait Api
 {
-    static $API_URL = "https://apirone.com/api/";
+    static $API_URL = "https://edge.qiwi.com";
 
-    private function post(string $url, array $params): array
+    private $token = '';
+
+    private $phone = '';
+
+    public function __construct(string $token, string $phone)
     {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params));
-        $response = curl_exec($curl);
-        curl_close($curl);
-        if ($response) {
-            return json_decode($response, true);
-        }
-        return [];
+        $this->token = $token;
+        $this->phone = $phone;
     }
 
-    private function get(string $url, array $params = [])
-    {
-        if (count($params) != 0)
-            $url .= '?' . http_build_query($params);
-        $response = file_get_contents($url);
 
-        if ($response) {
-            return json_decode($response, true);
+    private function sendRequest($method, array $content = [], $post = false) {
+        $ch = curl_init();
+        if ($post) {
+            curl_setopt($ch, CURLOPT_URL, self::$API_URL . $method);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($content));
+        } else {
+            curl_setopt($ch, CURLOPT_URL, self::$API_URL . $method . '?' . http_build_query($content));
         }
-        return [];
-    }
-
-    private function getURL(string $endpoint, array $swapping = [], $version = 'v2'): string
-    {
-        $url = self::$API_URL . $version . $endpoint;
-        if (empty($swapping)) {
-            return $url;
-        }
-
-        return vsprintf($url, $swapping);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $this->token
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($result, true);
     }
 }
