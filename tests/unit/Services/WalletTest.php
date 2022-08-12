@@ -19,7 +19,6 @@ class WalletTest extends TestCase
     {
         $walletService = new Wallet($this->token, $this->phone);
         $wallet_result = $walletService->getProfile();
-        self::assertEquals(json_encode($wallet_result), $this->phone);
         self::assertEquals($wallet_result['contractInfo']['contractId'], $this->phone);
     }
 
@@ -43,12 +42,19 @@ class WalletTest extends TestCase
 
     public function testBalanceException(): void
     {
-        $walletService = new Wallet($this->token, $this->phone);
+        $walletService = new Wallet($this->token . '1', $this->phone);
         try {
             $wallet_result = $walletService->getBalance();
             self::assertEquals(1, 2);
         } catch (\Exception $e) {
             self::assertEquals($e->getMessage(), 'Not valid phone');
         }
+    }
+
+    public function testRestrictions()
+    {
+        $walletService = new Wallet($this->token, $this->phone);
+        $wallet_result = $walletService->getBalance();
+        self::assertTrue($wallet_result['accounts'][0]['hasBalance']);
     }
 }

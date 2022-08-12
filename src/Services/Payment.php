@@ -81,25 +81,12 @@ class Payment implements PaymentInterface
     {
         $path = self::PATH_AWAITING . $this->phone . ".txt";
         if (file_exists($path)) {
-            $data = file_get_contents($path);
-            $dataArray = explode(PHP_EOL, $data);
-            foreach ($dataArray as $key => $item) {
-                if(isset($phone)) {
-                    $data = $amount . self::SEPARATOR . $currency_code . self::SEPARATOR . $phone;
-                } else {
-                    $data = $amount . self::SEPARATOR . $currency_code ;
-                }
-                if(intval($item) == $data) {
-                    unset($dataArray[$key]);
-                }
-            }
-            // Если сохранять нечего, удаляем файл
-            $data = implode(PHP_EOL, $dataArray);
-            if(empty($data)) {
-                unlink($path);
+            if(isset($phone)) {
+                $data = $amount . self::SEPARATOR . $currency_code . self::SEPARATOR . $phone;
             } else {
-                file_put_contents($path, $data);
+                $data = $amount . self::SEPARATOR . $currency_code ;
             }
+            $this->deleteAwaiting($data);
         } else {
             throw new QiwiException('not found bills');
         }
@@ -148,8 +135,14 @@ class Payment implements PaymentInterface
                             break;
                         }
                     }
-                    // Нашли платеж, добавляем его в историю
+                    // Нашли платеж, добавляем его в историю и удаляем и awaiting
                     if($isPay) {
+                        if(isset($phone)) {
+                            $data = $amount . self::SEPARATOR . $currency_code . self::SEPARATOR . $phone;
+                        } else {
+                            $data = $amount . self::SEPARATOR . $currency_code ;
+                        }
+                        $this->deleteAwaiting($data);
                         $this->addId($item['txnId']);
                         break;
                     }
@@ -158,6 +151,29 @@ class Payment implements PaymentInterface
             return $isPay;
         } else {
             throw new QiwiException('not found bills');
+        }
+    }
+
+    /**
+     * Удаляет ожидающий платеж
+     * @param string $data
+     */
+    public function deleteAwaiting(string $data): void
+    {
+        $path = self::PATH_AWAITING . $this->phone . ".txt";
+        $dataNew = file_get_contents($path);
+        $dataArray = explode(PHP_EOL, $dataNew);
+        foreach ($dataArray as $key => $item) {
+            if(intval($item) == $data) {
+                unset($dataArray[$key]);
+            }
+        }
+        // Если сохранять нечего, удаляем файл
+        $data = implode(PHP_EOL, $dataArray);
+        if(empty($data)) {
+            unlink($path);
+        } else {
+            file_put_contents($path, $data);
         }
     }
 

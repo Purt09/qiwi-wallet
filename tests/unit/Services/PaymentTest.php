@@ -13,9 +13,9 @@ class PaymentTest extends TestCase
     public $phone = "";
     public $token = "";
     // Сумма, которая есть в истории
-    public $old_amount = 1;
+    public $old_amount = 3;
     // Сумма, которая есть в истории для перевода с номером
-    public $old_amount_phone = 1;
+    public $old_amount_phone = 15;
     // номер с которого перевод
     public $leftPhone = "";
 
@@ -25,6 +25,39 @@ class PaymentTest extends TestCase
         $payment->create();
 
         $this->assertFileExists(Payment::PATH_WALLET . $this->phone . '.txt');
+    }
+
+    public function testDeleteAwaiting()
+    {
+        $payment = new Payment($this->token, $this->phone);
+        $amount = $payment->billCreate($amount = 100, $currency = 643);
+        $this->assertEquals($amount, 100);
+        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $this->assertFileExists($path);
+        $payment->deleteAwaiting($amount . Payment::SEPARATOR . $currency);
+        $this->assertFileNotExists($path);
+
+        $amount = $payment->billCreate($amount = 100, $currency = 643);
+        $this->assertEquals($amount, 100);
+        $amount = $payment->billCreate($amount = 100, $currency = 643);
+        $this->assertEquals($amount, 101);
+        $payment->billCancel(100, $currency = 643);
+        $data = file_get_contents($path);
+        $this->assertEquals($data, $amount . Payment::SEPARATOR . $currency . PHP_EOL);
+        $payment->billCancel($amount, $currency = 643);
+        $this->assertFileNotExists($path);
+
+
+        $amount = $payment->billCreate($amount = 100, $currency = 643, '+213123');
+        $this->assertEquals($amount, 100);
+        $amount = $payment->billCreate($amount = 100, $currency = 643, $phone = '+213123');
+        $this->assertEquals($amount, 101);
+        $this->assertFileExists($path);
+        $payment->billCancel(100, $currency = 643, $phone);
+        $data = file_get_contents($path);
+        $this->assertEquals($data, $amount . Payment::SEPARATOR . $currency . Payment::SEPARATOR . $phone . PHP_EOL);
+        $payment->billCancel($amount, $currency = 643, $phone);
+        $this->assertFileNotExists($path);
     }
 
     public function testBillCreate()
@@ -78,9 +111,13 @@ class PaymentTest extends TestCase
     {
         // Проверяем что удалился платеж
         $payment = new Payment($this->token, $this->phone);
-        $payment->billCancel($amount = 101, $currency = 643);
+        $currency = 643;
         $path = Payment::PATH_AWAITING . $this->phone . '.txt';
         $this->assertFileExists($path);
+        $data = file_get_contents($path);
+        $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . 101 . Payment::SEPARATOR . $currency . PHP_EOL . 102 . Payment::SEPARATOR . $currency . PHP_EOL . 103 . Payment::SEPARATOR . $currency . PHP_EOL, $data);
+        $payment->billCancel(101, $currency);
+
         $data = file_get_contents($path);
         $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . 102 . Payment::SEPARATOR . $currency . PHP_EOL . 103 . Payment::SEPARATOR . $currency . PHP_EOL, $data);
 
@@ -124,6 +161,7 @@ class PaymentTest extends TestCase
         $result = $payment->billCheck($this->old_amount, $currency = 643);
         $this->assertTrue($result);
         // Неверная валюта, проверка
+        $payment->billCreate($this->old_amount, $currency = 644);
         $result = $payment->billCheck($this->old_amount, $currency = 644);
         $this->assertFalse($result);
     }
