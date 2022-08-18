@@ -10,21 +10,31 @@ class Payment implements PaymentInterface
 {
     use Api;
 
-    const PATH_WALLET = 'runtime/wallets/';
-    const PATH_AWAITING = 'runtime/awaiting/';
+    const PATH_WALLET = '/runtime/wallets/';
+    const PATH_AWAITING =  '/runtime/awaiting/';
     /**
-     * Разделитель между AMOUNT и CURRENCY_CODE
+     * Разделитель между AMOUNT и CURRENCY_CODE и phone
      */
     const SEPARATOR = ':';
 
     // Лимит хранения в файле runtime/wallets/phone.txt
     private $limit = 200;
 
+    public static function getWalletPath()
+    {
+        return dirname(__DIR__, 2) . self::PATH_WALLET;
+    }
+
+    public static function getAwaitingPath()
+    {
+        return dirname(__DIR__, 2) . self::PATH_AWAITING;
+    }
+
     public function create(): void
     {
         $history = new History($this->token, $this->phone);
         $data = $history->getHistory();
-        $path = self::PATH_WALLET . $this->phone . ".txt";
+        $path = self::getWalletPath() . $this->phone . ".txt";
         $result = '';
         foreach ($data['data'] as $item) {
             $result .= $item['txnId'] . PHP_EOL;
@@ -35,7 +45,7 @@ class Payment implements PaymentInterface
 
     public function billCreate(int $amount, int $currency_code, ?string $phone = null): int
     {
-        $path = self::PATH_AWAITING . $this->phone . ".txt";
+        $path = self::getAwaitingPath() . $this->phone . ".txt";
         if (file_exists($path)) {
             $data = file_get_contents($path);
             $dataArray = explode(PHP_EOL, $data);
@@ -79,7 +89,7 @@ class Payment implements PaymentInterface
 
     public function billCancel(int $amount, int $currency_code, ?string $phone = null): void
     {
-        $path = self::PATH_AWAITING . $this->phone . ".txt";
+        $path = self::getAwaitingPath() . $this->phone . ".txt";
         if (file_exists($path)) {
             if(isset($phone)) {
                 $data = $amount . self::SEPARATOR . $currency_code . self::SEPARATOR . $phone;
@@ -94,7 +104,7 @@ class Payment implements PaymentInterface
 
     public function billCheck(int $amount, int $currency_code, ?string $phone = null): bool
     {
-        $pathAwaiting = self::PATH_AWAITING . $this->phone . ".txt";
+        $pathAwaiting = self::getAwaitingPath() . $this->phone . ".txt";
         if (file_exists($pathAwaiting)) {
             $data = file_get_contents($pathAwaiting);
             $dataArray = explode(PHP_EOL, $data);
@@ -113,7 +123,7 @@ class Payment implements PaymentInterface
                 throw new QiwiException('not found bills, because you not use method billCreate()');
 
 
-            $pathWallets = self::PATH_WALLET . $this->phone . ".txt";
+            $pathWallets = self::getWalletPath() . $this->phone . ".txt";
             $data = file_get_contents($pathWallets);
             // Тут номера заказов
             $dataArray = explode(PHP_EOL, $data);
@@ -160,7 +170,7 @@ class Payment implements PaymentInterface
      */
     public function deleteAwaiting(string $data): void
     {
-        $path = self::PATH_AWAITING . $this->phone . ".txt";
+        $path = self::getAwaitingPath() . $this->phone . ".txt";
         $dataNew = file_get_contents($path);
         $dataArray = explode(PHP_EOL, $dataNew);
         foreach ($dataArray as $key => $item) {
@@ -184,7 +194,7 @@ class Payment implements PaymentInterface
      */
     public function addId(int $id): void
     {
-        $path = self::PATH_WALLET . $this->phone . ".txt";
+        $path = self::getWalletPath() . $this->phone . ".txt";
         $data = file_get_contents($path);
         $dataArray = explode(PHP_EOL, $data);
         array_push($dataArray, $id);
@@ -198,10 +208,10 @@ class Payment implements PaymentInterface
 
     public function delete(): void
     {
-        $path = self::PATH_WALLET . $this->phone . ".txt";
+        $path = self::getWalletPath() . $this->phone . ".txt";
         if (file_exists($path))
             unlink($path);
-        $path = self::PATH_AWAITING . $this->phone . ".txt";
+        $path = self::getAwaitingPath() . $this->phone . ".txt";
         if (file_exists($path))
             unlink($path);
     }

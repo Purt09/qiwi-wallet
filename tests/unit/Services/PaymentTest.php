@@ -24,7 +24,7 @@ class PaymentTest extends TestCase
         $payment = new Payment($this->token, $this->phone);
         $payment->create();
 
-        $this->assertFileExists(Payment::PATH_WALLET . $this->phone . '.txt');
+        $this->assertFileExists(Payment::getWalletPath() . $this->phone . '.txt');
     }
 
     public function testDeleteAwaiting()
@@ -32,7 +32,7 @@ class PaymentTest extends TestCase
         $payment = new Payment($this->token, $this->phone);
         $amount = $payment->billCreate($amount = 100, $currency = 643);
         $this->assertEquals($amount, 100);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $payment->deleteAwaiting($amount . Payment::SEPARATOR . $currency);
         $this->assertFileNotExists($path);
@@ -66,7 +66,7 @@ class PaymentTest extends TestCase
         // Первое добавление заявки на оплату
         $amount = $payment->billCreate($amount = 100, $currency = 643);
         $this->assertEquals($amount, 100);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals($amount . Payment::SEPARATOR . $currency . PHP_EOL, $data);
@@ -74,7 +74,7 @@ class PaymentTest extends TestCase
         // Вторая заявка на оплату
         $amount = $payment->billCreate($amount = 101, $currency = 643);
         $this->assertEquals($amount, 101);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . $amount . Payment::SEPARATOR . $currency . PHP_EOL, $data);
@@ -82,7 +82,7 @@ class PaymentTest extends TestCase
         // Третья заявка на оплату, с занятой суммой
         $amount = $payment->billCreate($amount = 101, $currency = 643);
         $this->assertEquals($amount, 102);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . 101 . Payment::SEPARATOR . $currency . PHP_EOL .
@@ -91,7 +91,7 @@ class PaymentTest extends TestCase
         // Третья заявка на оплату, с занятой суммой
         $amount = $payment->billCreate($amount = 101, $currency = 643);
         $this->assertEquals($amount, 103);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . 101 . Payment::SEPARATOR . $currency . PHP_EOL .
@@ -101,7 +101,7 @@ class PaymentTest extends TestCase
         $payment = new Payment($this->token, $this->phone . '1');
         $amount = $payment->billCreate($amount = 101, $currency = 643);
         $this->assertEquals($amount, 101);
-        $path = Payment::PATH_AWAITING . $this->phone . '1' . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '1' . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals(101 . Payment::SEPARATOR . $currency . PHP_EOL, $data);
@@ -112,7 +112,7 @@ class PaymentTest extends TestCase
         // Проверяем что удалился платеж
         $payment = new Payment($this->token, $this->phone);
         $currency = 643;
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals(100 . Payment::SEPARATOR . $currency . PHP_EOL . 101 . Payment::SEPARATOR . $currency . PHP_EOL . 102 . Payment::SEPARATOR . $currency . PHP_EOL . 103 . Payment::SEPARATOR . $currency . PHP_EOL, $data);
@@ -124,7 +124,7 @@ class PaymentTest extends TestCase
         // Проверяем, что удалился файл. Так как в нем всего один платеж
         $payment = new Payment($this->token, $this->phone . '1');
         $payment->billCancel($amount = 101, $currency = 643);
-        $path = Payment::PATH_AWAITING . $this->phone . '1' . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '1' . '.txt';
         $this->assertFileNotExists($path);
     }
 
@@ -152,7 +152,7 @@ class PaymentTest extends TestCase
 
 
         // Проверить на успешный платеж
-        $path = Payment::PATH_WALLET . $this->phone . ".txt";
+        $path = Payment::getWalletPath() . $this->phone . ".txt";
         if (file_exists($path))
             unlink($path);
         $result = '';
@@ -172,7 +172,7 @@ class PaymentTest extends TestCase
         $payment = new Payment($this->token, $this->phone);
         $payment->create();
         $payment->addId(1);
-        $path = Payment::PATH_WALLET . $this->phone . ".txt";
+        $path = Payment::getWalletPath() . $this->phone . ".txt";
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $dataArray = explode(PHP_EOL, $data);
@@ -197,7 +197,7 @@ class PaymentTest extends TestCase
         $amount = $payment->billCreate(100, $currency = 643);
         $amount = $payment->billCreate(100, $currency = 643, $this->leftPhone);
         $this->assertEquals($amount, 100);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileExists($path);
         $data = file_get_contents($path);
         $this->assertEquals($amount . Payment::SEPARATOR . $currency . PHP_EOL . $amount . Payment::SEPARATOR . $currency . Payment::SEPARATOR . $this->leftPhone . PHP_EOL, $data);
@@ -207,10 +207,10 @@ class PaymentTest extends TestCase
         $this->assertFalse($payment->billCheck($amount = 100, $currency = 643, $this->leftPhone));
         $payment->billCancel($amount = 100, $currency = 643, $this->leftPhone);
         $payment->billCancel($amount = 101, $currency = 643, $this->leftPhone);
-        $path = Payment::PATH_AWAITING . $this->phone . '.txt';
+        $path = Payment::getAwaitingPath() . $this->phone . '.txt';
         $this->assertFileNotExists($path);
 
-        $path = Payment::PATH_WALLET . $this->phone . ".txt";
+        $path = Payment::getWalletPath() . $this->phone . ".txt";
         if (file_exists($path))
             unlink($path);
         $result = '';
@@ -223,7 +223,7 @@ class PaymentTest extends TestCase
     {
         $payment = new Payment($this->token, $this->phone);
         $payment->delete();
-        $this->assertFileNotExists(Payment::PATH_WALLET . $this->phone . '.txt');
+        $this->assertFileNotExists(Payment::getWalletPath() . $this->phone . '.txt');
         $payment = new Payment($this->token, $this->phone . '1');
         $payment->delete();
 
