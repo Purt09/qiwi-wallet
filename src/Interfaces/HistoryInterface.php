@@ -22,6 +22,6 @@ interface HistoryInterface
      * @param int $currency
      * @return bool
      */
-    public function checkByComment(string $comment, int $currency): bool;
+    public function checkByComment(string $comment, int $amount, int $currency): bool;
 
 }
