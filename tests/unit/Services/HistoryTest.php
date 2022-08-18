@@ -12,7 +12,9 @@ class HistoryTest extends TestCase
     public $phone = "";
     public $token = "";
     // Комментарий, который есть в истории (Последние 50 платежей)
-    public $last_comment = '3';
+    public $last_comment = '1';
+    // сумма у транзакции с данным комментарием
+    public $last_amount = 1500;
 
     public function testHistory(): void
     {
@@ -36,14 +38,20 @@ class HistoryTest extends TestCase
     public function testCheckPayComment(): void
     {
         $walletService = new History($this->token, $this->phone);
-        $wallet_result = $walletService->checkByComment($this->last_comment);
+        $wallet_result = $walletService->checkByComment($this->last_comment, $this->last_amount);
         $this->assertTrue($wallet_result);
+
+        $wallet_result = $walletService->checkByComment($this->last_comment, $this->last_amount . rand(10, 100000));
+        $this->assertFalse($wallet_result);
+
+        $wallet_result = $walletService->checkByComment($this->last_comment, $this->last_amount, 123);
+        $this->assertFalse($wallet_result);
     }
 
     public function testCheckPayCommentNotFound(): void
     {
         $walletService = new History($this->token, $this->phone);
-        $wallet_result = $walletService->checkByComment($this->last_comment . rand(10, 100000));
+        $wallet_result = $walletService->checkByComment($this->last_comment . rand(10, 100000), 123);
         $this->assertFalse($wallet_result);
     }
 }

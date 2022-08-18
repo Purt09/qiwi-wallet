@@ -29,11 +29,13 @@ class History implements HistoryInterface
         return $result;
     }
 
-    public function checkByComment(string $comment, int $currency = 643): bool
+    public function checkByComment(string $comment, int $amount, int $currency = 643): bool
     {
         $data = $this->getHistory();
 
         foreach ($data['data'] as $item) {
+            if($item['sum']['amount'] != $amount / 100)
+                continue;
             if($item['sum']['currency'] != $currency)
                 continue;
             if($item['status'] != 'SUCCESS')
