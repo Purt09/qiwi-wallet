@@ -132,8 +132,9 @@ class Payment implements PaymentInterface
             $dataTransaction = $history->getHistory();
             // Проверяем есть ли совпадения в истории
             $isPay = false;
+            $amountQiwi = $amount / 100;
             foreach ($dataTransaction['data'] as $item) {
-                if($item['sum']['amount'] == $amount && $item['sum']['currency'] == $currency_code) {
+                if($item['sum']['amount'] == $amountQiwi && $item['sum']['currency'] == $currency_code) {
                     if(isset($phone)) {
                         if($item['account'] != $phone)
                             continue;
