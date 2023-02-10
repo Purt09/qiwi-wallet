@@ -8,20 +8,19 @@ interface HistoryInterface
      * Получить историю платежей
      * @param string $operation
      * @param int $rows
-     * @param string $startDate
-     * @param string $endDate
+     * @param string $proxy
      * @return array
      */
-    public function getHistory(string $operation = "IN", int $rows = 50, string $startDate = "", string $endDate = ""): array;
+    public function getHistory(string $operation = "IN", int $rows = 50, string $proxy = ''): array;
 
     /**
-     * Находит платеж по комментарию
-     * true - найдено
-     * false - не найдено
+     * Найти платеж по комментарию
      * @param string $comment
+     * @param int $amount
      * @param int $currency
+     * @param string $proxy
      * @return bool
      */
-    public function checkByComment(string $comment, int $amount, int $currency): bool;
+    public function checkByComment(string $comment, int $amount, int $currency = 643, string $proxy = ''): bool;
 
 }

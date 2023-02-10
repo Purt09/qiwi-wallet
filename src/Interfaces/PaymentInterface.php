@@ -61,9 +61,10 @@ interface PaymentInterface
      * @param int $amount
      * @param int $currency_code - В какой валюте был перевод?
      * @param string|null $phone
+     * @param string $proxy
      * @return bool
      */
-    public function billCheck(int $amount, int $currency_code, ?string $phone): bool;
+    public function billCheck(int $amount, int $currency_code, ?string $phone = null, string $proxy = ''): bool;
 
     /**
      * Удаляет все данные о кошельке

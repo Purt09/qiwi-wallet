@@ -30,10 +30,10 @@ class Payment implements PaymentInterface
         return dirname(__DIR__, 2) . self::PATH_AWAITING;
     }
 
-    public function create(): void
+    public function create(string $proxy = ''): void
     {
         $history = new History($this->token, $this->phone);
-        $data = $history->getHistory();
+        $data = $history->getHistory('IN', 50, $proxy);
         $path = self::getWalletPath() . $this->phone . ".txt";
         $result = '';
         foreach ($data['data'] as $item) {
@@ -102,7 +102,7 @@ class Payment implements PaymentInterface
         }
     }
 
-    public function billCheck(int $amount, int $currency_code, ?string $phone = null): bool
+    public function billCheck(int $amount, int $currency_code, ?string $phone = null, string $proxy = ''): bool
     {
         $pathAwaiting = self::getAwaitingPath() . $this->phone . ".txt";
         if (file_exists($pathAwaiting)) {
@@ -129,7 +129,7 @@ class Payment implements PaymentInterface
             $dataArray = explode(PHP_EOL, $data);
             $history = new History($this->token, $this->phone);
             // Тут новая история транзакций
-            $dataTransaction = $history->getHistory();
+            $dataTransaction = $history->getHistory('IN', 50, $proxy);
             // Проверяем есть ли совпадения в истории
             $isPay = false;
             $amountQiwi = $amount / 100;

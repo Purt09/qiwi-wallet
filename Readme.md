@@ -1,5 +1,5 @@
 ## installing the package
-SDK for working with qiwi.com/api
+PHP Library for working with qiwi.com/api
 ### From CLI
 ```$xslt
 $ composer config repositories.apirone vcs https://github.com/purt09/qiwi-wallet.git
@@ -38,6 +38,7 @@ Payment - поддерживает работу с несколькими кош
 Цикл работы для платежа:
 billCreate() - создает заявку на платеж, затем проверка платежа billCheck(). Если платеж найдется, то библиотека сама удалит данные
 Если платежа не будет, необходимо самостоятельно отменить платеж billCancel().
+Если вы не будете отменять, то система не будет освобождать суммы.
 
 Если вы закончили работать полностью с кошельком, то необходимо удалить его payment->delete()
 

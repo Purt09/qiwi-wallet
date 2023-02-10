@@ -13,9 +13,9 @@ class PaymentTest extends TestCase
     public $phone = "";
     public $token = "";
     // Сумма, которая есть в истории
-    public $old_amount = 3;
+    public $old_amount = 67800;
     // Сумма, которая есть в истории для перевода с номером
-    public $old_amount_phone = 15;
+    public $old_amount_phone = 22600;
     // номер с которого перевод
     public $leftPhone = "";
 

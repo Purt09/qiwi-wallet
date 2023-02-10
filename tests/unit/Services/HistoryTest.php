@@ -14,7 +14,7 @@ class HistoryTest extends TestCase
     // Комментарий, который есть в истории (Последние 50 платежей)
     public $last_comment = '1';
     // сумма у транзакции с данным комментарием
-    public $last_amount = 1500;
+    public $last_amount = 20000;
 
     public function testHistory(): void
     {
@@ -31,7 +31,7 @@ class HistoryTest extends TestCase
             $wallet_result = $walletService->getHistory('IN', 1);
             self::assertEquals(1, 2);
         } catch (\Exception $e) {
-            self::assertEquals($e->getMessage(), 'Not valid phone');
+            self::assertEquals($e->getMessage(), 'Not valid token');
         }
     }
 

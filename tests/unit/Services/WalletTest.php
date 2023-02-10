@@ -22,6 +22,14 @@ class WalletTest extends TestCase
         self::assertEquals($wallet_result['contractInfo']['contractId'], $this->phone);
     }
 
+    public function testProfileProxy(): void
+    {
+        $walletService = new Wallet($this->token, $this->phone);
+        $proxy = 'IP:PORT';
+        $wallet_result = $walletService->getProfile($proxy);
+        self::assertEquals($wallet_result['contractInfo']['contractId'], $this->phone);
+    }
+
     public function testProfileException(): void
     {
         $walletService = new Wallet($this->token . '1', $this->phone);
@@ -29,7 +37,7 @@ class WalletTest extends TestCase
             $wallet_result = $walletService->getProfile();
             self::assertEquals(1, 2);
         } catch (\Exception $e) {
-            self::assertEquals($e->getMessage(), 'Not valid phone');
+            self::assertEquals($e->getMessage(), 'Not valid token');
         }
     }
 
@@ -47,7 +55,7 @@ class WalletTest extends TestCase
             $wallet_result = $walletService->getBalance();
             self::assertEquals(1, 2);
         } catch (\Exception $e) {
-            self::assertEquals($e->getMessage(), 'Not valid phone');
+            self::assertEquals($e->getMessage(), 'Not valid token');
         }
     }
 
